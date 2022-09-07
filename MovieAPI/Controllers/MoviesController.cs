@@ -23,24 +23,32 @@ namespace MovieAPI.Controllers
 
         // GET: api/Movies
         [HttpGet]
+        [Route("GetMovies")]
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovie()
         {
-          if (_context.Movie == null)
+          if (_context.Movies == null)
           {
               return NotFound();
           }
-            return await _context.Movie.ToListAsync();
+            var movies = _context.Movies.Where(x => x.Name != null).Include(i => i.Genres);
+            return await movies.ToListAsync();
         }
 
         // GET: api/Movies/5
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("GetMovieById")]
         public async Task<ActionResult<Movie>> GetMovie(int id)
         {
-          if (_context.Movie == null)
+          if (_context.Movies == null)
           {
               return NotFound();
           }
-            var movie = await _context.Movie.FindAsync(id);
+            var movie = await _context.Movies.FindAsync(id);
+
+            using (_context)
+            {
+
+            }
 
             if (movie == null)
             {
@@ -51,8 +59,8 @@ namespace MovieAPI.Controllers
         }
 
         // PUT: api/Movies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Route("EditMovie")]
         public async Task<IActionResult> PutMovie(int id, Movie movie)
         {
             if (id != movie.Id)
@@ -82,35 +90,36 @@ namespace MovieAPI.Controllers
         }
 
         // POST: api/Movies
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie(Movie movie)
+        [Route("InsertMovie")]
+        public async Task<ActionResult<Movie>> PostMovie([FromBody] Movie movie)
         {
-          if (_context.Movie == null)
+          if (_context.Movies == null)
           {
               return Problem("Entity set 'MovieAPIContext.Movie'  is null.");
           }
-            _context.Movie.Add(movie);
+            _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
         }
 
         // DELETE: api/Movies/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("DeleteMovie")]
         public async Task<IActionResult> DeleteMovie(int id)
         {
-            if (_context.Movie == null)
+            if (_context.Movies == null)
             {
                 return NotFound();
             }
-            var movie = await _context.Movie.FindAsync(id);
+            var movie = await _context.Movies.FindAsync(id);
             if (movie == null)
             {
                 return NotFound();
             }
 
-            _context.Movie.Remove(movie);
+            _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -118,7 +127,7 @@ namespace MovieAPI.Controllers
 
         private bool MovieExists(int id)
         {
-            return (_context.Movie?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Movies?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -14,6 +14,7 @@ namespace MovieAPI.Data
         {
         }
 
-        public DbSet<MovieAPI.Models.Movie> Movie { get; set; } = default!;
+        public DbSet<MovieAPI.Models.Movie> Movies { get; set; } = default!;
+        public DbSet<MovieAPI.Models.Genre> Genres { get; set; } = default!;
     }
 }
